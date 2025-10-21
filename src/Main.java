@@ -19,7 +19,8 @@ public class Main {
     public static File[] getFiles(){ // get all files in a given directory
         Scanner scanner = new Scanner(System.in);
         System.out.println("Input a directory to scan for mods:");
-        File workingDir = new File("C:\\Users\\cakeb\\curseforge\\minecraft\\Instances\\aydne (1)\\mods");
+        String dirPath = scanner.nextLine();
+        File workingDir = new File(dirPath);
         File[] files = workingDir.listFiles();
 
         if (files != null){
