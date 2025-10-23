@@ -5,7 +5,7 @@ import java.io.File;
 import java.util.Arrays;
 
 public class WindowHandler{
-    private static JFrame mainWindow = new JFrame("Afterglow's Mod Manager");
+    private static JFrame mainWindow = new JFrame("Toily Minus");
     private static DefaultTableModel model; // Class-level variable for the model
     public static Boolean[] tableStates;
 
