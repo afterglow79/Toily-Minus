@@ -5,6 +5,7 @@ public class Main {
 
     static File[] modFiles;
     public static void main(String[] args) {
+
         System.out.println("Starting");
 
         modFiles = getFiles();
@@ -25,15 +26,14 @@ public class Main {
 
         if (files != null){
             for (File file: files){
-                if (file.isDirectory()) {
-
-                } else {
+                if (!file.isDirectory()) {
                     System.out.println("File found: " + file.getName());
                 }
             }
         } else {
             System.out.println("The directory is empty or does not exist.");
         }
+
         return files;
     }
 }
