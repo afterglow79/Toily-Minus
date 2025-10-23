@@ -9,27 +9,43 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Starting");
+        System.out.println("--------------------------------\n");
+        Scanner scanner = new Scanner(System.in);
 
-        modFiles = getFiles();
+//        System.out.println("Input a directory to scan for mods:");
+//        String dirPath = scanner.nextLine();
+        String dirPath = "mods"; // hardcoded for testing
+
+        modFiles = getFiles(dirPath);
 
         WindowHandler mainWindow = new WindowHandler();
         mainWindow.createLabels(modFiles);
         mainWindow.createWindow();
 
-        Scanner scanner = new Scanner(System.in);
 
-        if (Objects.equals(scanner.nextLine(), "test")){
-            System.out.println(Arrays.toString(mainWindow.getEnabledModsIndexes()));
-            System.out.println(Arrays.toString(mainWindow.getEnabledModsNames()));
+        if (scanner.nextInt() == 1){
+            System.out.println("Continuing..."); // simple way to pause the program for testing
         }
+
+        String modpackName = "test2";
+        ModHandler modHandler = new ModHandler();
+
+        // it would make sense to run these through the WindowHandler class because it would update on each checkbox tick/button press
+        modHandler.setModpackName(modpackName);
+        modHandler.setModsFolderPath(dirPath);
+        modHandler.setModsFolderPathMC("pretendThisIsMinecraftModsFolder"); // hardcoded for testing
+
+        modHandler.createNewModpackFolder();
+        modHandler.createModpackSaveFile();
+
+        modHandler.saveEnabledMods(mainWindow.getEnabledModsNames()); // save the enabled mods based on checkbox states in the window
+        modHandler.moveEnabledModsToModpackFolder(); // move the enabled mods to the modpack folder
+        modHandler.loadEnabledMods(); // load the enabled mods into the minecraft mods folder
     }
 
 
 
-    public static File[] getFiles(){ // get all files in a given directory
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Input a directory to scan for mods:");
-        String dirPath = scanner.nextLine();
+    public static File[] getFiles(String dirPath){ // get all files in a given directory
         File workingDir = new File(dirPath);
         File[] files = workingDir.listFiles();
 
@@ -42,7 +58,7 @@ public class Main {
         } else {
             System.out.println("The directory is empty or does not exist.");
         }
-
+        System.out.println();
         return files;
     }
 }

@@ -14,11 +14,10 @@ public class WindowHandler{
         mainWindow.setSize(1280, 720);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.getContentPane().setLayout(new FlowLayout());
-
         mainWindow.setVisible(true);
     }
 
-    public static void createLabels(File[] files) {
+    public void createLabels(File[] files) {
         Container content = mainWindow.getContentPane();
 
         String[] columnNames = {"Is Enabled", "Mod Name"};
@@ -45,6 +44,7 @@ public class WindowHandler{
                 tableStates[row] = isChecked;
                 System.out.println("Row " + row + " checkbox is now: " + isChecked + " | " + data[row][1]);
                 System.out.println("\n Current table states:    " + Arrays.toString(tableStates));
+                System.out.println();
             }
 
             for (int i = 0; i < tableStates.length; i++) {
@@ -52,6 +52,7 @@ public class WindowHandler{
                     System.out.println(data[i][1] + "   is enabled");
                 }
             }
+            System.out.println();
 
         });
 
@@ -99,6 +100,4 @@ public class WindowHandler{
         }
         return Arrays.copyOf(enabledModNames, count); // return only the filled portion
     }
-
-
 }
