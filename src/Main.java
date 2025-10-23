@@ -1,4 +1,6 @@
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -13,15 +15,21 @@ public class Main {
         WindowHandler mainWindow = new WindowHandler();
         mainWindow.createLabels(modFiles);
         mainWindow.createWindow();
+
+        Scanner scanner = new Scanner(System.in);
+
+        if (Objects.equals(scanner.nextLine(), "test")){
+            System.out.println(Arrays.toString(mainWindow.getEnabledModsIndexes()));
+            System.out.println(Arrays.toString(mainWindow.getEnabledModsNames()));
+        }
     }
 
 
 
     public static File[] getFiles(){ // get all files in a given directory
         Scanner scanner = new Scanner(System.in);
-        // System.out.println("Input a directory to scan for mods:");
-        // String dirPath = scanner.nextLine();
-        String dirPath = "C:\\Users\\cakeb\\curseforge\\minecraft\\Instances\\aydne (1)\\mods";
+        System.out.println("Input a directory to scan for mods:");
+        String dirPath = scanner.nextLine();
         File workingDir = new File(dirPath);
         File[] files = workingDir.listFiles();
 

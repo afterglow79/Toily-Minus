@@ -5,9 +5,10 @@ import java.io.File;
 import java.util.Arrays;
 
 public class WindowHandler{
-    private static JFrame mainWindow = new JFrame("Toily Minus");
+    public static JFrame mainWindow = new JFrame("Toily Minus");
     private static DefaultTableModel model; // Class-level variable for the model
     public static Boolean[] tableStates;
+    private static Object[][] data;
 
     public void createWindow() {
         mainWindow.setSize(1280, 720);
@@ -21,7 +22,7 @@ public class WindowHandler{
         Container content = mainWindow.getContentPane();
 
         String[] columnNames = {"Is Enabled", "Mod Name"};
-        Object[][] data = new Object[files.length][2];
+        data = new Object[files.length][2];
         tableStates = new Boolean[files.length];
         for (int i = 0; i < files.length; i++) {
             data[i][0] = Boolean.FALSE; // Default to disabled
@@ -76,11 +77,28 @@ public class WindowHandler{
         content.add(new JScrollPane(table));
     }
 
-    public boolean isRowEnabled(int row) {
-        if (row < 0) return false;
-        Object value = tableStates[row];
-        System.out.println("value at row " + row + ": " + value);
-        return value != null ? (Boolean) value : false;
+    public Boolean[] getEnabledModsIndexes(){
+        int count = 0;
+        Boolean[] enabledModIndexes = new Boolean[tableStates.length];
+        for (int i = 0; i < tableStates.length; i++) {
+            if (tableStates[i]) {
+                enabledModIndexes[count] = true;
+                count++;
+        }}
+        return Arrays.copyOf(enabledModIndexes, count);
     }
+
+    public String[] getEnabledModsNames(){
+        String[] enabledModNames = new String[data.length];
+        int count = 0;
+        for (int i = 0; i < tableStates.length; i++) {
+            if (tableStates[i]) {
+                enabledModNames[count] = (String) data[i][1];
+                count++;
+            }
+        }
+        return Arrays.copyOf(enabledModNames, count); // return only the filled portion
+    }
+
 
 }
