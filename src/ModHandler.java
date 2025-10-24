@@ -7,7 +7,7 @@ public class ModHandler {
 
     private static String modsFolderPathMC; // will be passed through, this is the path to the minecraft/mods folder
     private static String modsFolderPath; // path to the mods folder being used for modpack creation
-    private static String modpackName;
+    private static String modpackName = "modpackTextFiles/";
     private static File[] modsInTheModpack;
 
     public void createModpackSaveFile() { // I apologize for the nonsensical names here, I am incredibly tired as I make this -- I will not fix them later
@@ -58,8 +58,10 @@ public class ModHandler {
     public void moveEnabledModsToModpackFolder(){ // move the enabled mods to the modpack folder
         File modpackFolder = new File(modpackName + "_modpack");
         File initalModsFolder = new File(modsFolderPath);
-
         String filename = modpackName + "_enabled_mods.txt";
+
+        try { clearModpackFolder(); } catch (IOException e) { throw new RuntimeException(); }
+
         try (Scanner scanner = new Scanner(new File(filename))) {
             while (scanner.hasNextLine()) {
                 String modName = scanner.nextLine();
@@ -127,6 +129,23 @@ public class ModHandler {
         System.out.println();
     }
 
+    public static void clearModpackFolder() throws IOException{
+        File dir = new File(modpackName + "_modpack");
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (!file.isDirectory()) {
+                    if (file.delete()) {
+                        System.out.println("Deleted file: " + file.getName());
+                    } else {
+                        System.out.println("Failed to delete file: " + file.getName());
+                    }
+                }
+            }
+        }
+        System.out.println();
+    }
+
     private static void fileCopier(File source, File dest) throws  IOException { // https://stackoverflow.com/questions/16433915/how-to-copy-file-from-one-location-to-another-location
         Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
@@ -140,6 +159,6 @@ public class ModHandler {
     }
 
     public void setModpackName(String name){
-        modpackName = name;
+        modpackName += name;
     }
 }

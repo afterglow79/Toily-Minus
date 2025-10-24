@@ -4,16 +4,18 @@ import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 
-public class WindowHandler{
+public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LOADED)
     public static JFrame mainWindow = new JFrame("Toily Minus");
-    private static DefaultTableModel model; // Class-level variable for the model
+    private static DefaultTableModel model;
     public static Boolean[] tableStates;
     private static Object[][] data;
+    private static File[] mods;
 
     public void createWindow() {
         mainWindow.setSize(1280, 720);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.getContentPane().setLayout(new FlowLayout());
+        createHomeScreen();
         mainWindow.setVisible(true);
     }
 
@@ -78,17 +80,6 @@ public class WindowHandler{
         content.add(new JScrollPane(table));
     }
 
-    public Boolean[] getEnabledModsIndexes(){
-        int count = 0;
-        Boolean[] enabledModIndexes = new Boolean[tableStates.length];
-        for (int i = 0; i < tableStates.length; i++) {
-            if (tableStates[i]) {
-                enabledModIndexes[count] = true;
-                count++;
-        }}
-        return Arrays.copyOf(enabledModIndexes, count);
-    }
-
     public String[] getEnabledModsNames(){
         String[] enabledModNames = new String[data.length];
         int count = 0;
@@ -99,5 +90,32 @@ public class WindowHandler{
             }
         }
         return Arrays.copyOf(enabledModNames, count); // return only the filled portion
+    }
+
+    public void createHomeScreen(){
+        JButton createNew = new JButton("Create New");
+        createNew.addActionListener(e -> {
+            // Action for "Create New" button
+            System.out.println("\"Create New\" button pressed");
+            createLabels(mods);
+        });
+
+        JButton useExisting = new JButton("Use Existing");
+        useExisting.addActionListener(e -> {
+            // Action for "Use Existing" button
+            System.out.println("\"Use Existing\" button pressed");
+        });
+
+        Container content = mainWindow.getContentPane();
+        content.add(createNew);
+        content.add(useExisting);
+    }
+
+    public void modpackButtonGenerator(){ // TODO -- for modpack text file inmodpackTextFiles, generate a button with text that is the modpack name (minus the .txt), clicking the button loads the modpack
+
+    }
+
+    public void setMods(File[] modFiles){
+        mods = modFiles;
     }
 }
