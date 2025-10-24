@@ -49,9 +49,9 @@ public class ModHandler {
         try{
             clearMCModsFolder(); // clear the minecraft mods folder before loading new mods
             for (File mod : modsInModpackForLoadingModpacks){
-                        fileCopier(mod, new File(modsFolderPathMC, mod.getName())); // copy the mod file to the minecraft mods folder
-                        System.out.println("Enabled mod: " + mod);
-                    }
+                fileCopier(mod, new File(modsFolderPathMC, mod.getName())); // copy the mod file to the minecraft mods folder
+                System.out.println("Enabled mod: " + mod);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

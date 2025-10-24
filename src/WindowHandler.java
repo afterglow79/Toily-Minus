@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LOADED)
+public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, AND THE ABILITY TO SEARCH FOR MODS WHEN CREATING A MODPACK
     public static JFrame mainWindow = new JFrame("Toily Minus");
     private static DefaultTableModel model;
     public static Boolean[] tableStates;
@@ -315,7 +315,7 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         dialog.setSize(400, 150);
 
         JTextField mcModsDirField = new JTextField(20);
-        JLabel mcModsDirLabel = new JLabel("Enter Minecraft Mods Directory:");
+        JLabel mcModsDirLabel = new JLabel("Enter Minecraft Mods Directory (minecraft/mods):");
         JButton submitButton = new JButton("Submit");
 
         submitButton.addActionListener(ev -> {
