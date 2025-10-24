@@ -1,6 +1,7 @@
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ModHandler {
@@ -9,6 +10,7 @@ public class ModHandler {
     private static String modsFolderPath; // path to the mods folder being used for modpack creation
     private static String modpackName = "modpacks/";
     private static File[] modsInTheModpack;
+    private static File[] modsInModpackForLoadingModpacks;
 
     public void createModpackSaveFile() { // I apologize for the nonsensical names here, I am incredibly tired as I make this -- I will not fix them later
         File thoseWhoEnable = new File(modpackName + "_enabled_mods.txt");
@@ -42,10 +44,11 @@ public class ModHandler {
     }
 
     public void loadEnabledMods() {
-        String filename = modpackName + "_enabled_mods.txt";
+        String filename = modpackName + "_modpack";
+        getModsInModpack(filename);
         try{
             clearMCModsFolder(); // clear the minecraft mods folder before loading new mods
-            for (File mod : modsInTheModpack){
+            for (File mod : modsInModpackForLoadingModpacks){
                         fileCopier(mod, new File(modsFolderPathMC, mod.getName())); // copy the mod file to the minecraft mods folder
                         System.out.println("Enabled mod: " + mod);
                     }
@@ -53,6 +56,28 @@ public class ModHandler {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public void getModsInModpack(String modpack){
+
+        modpack = modpack.replace("_enabled_mods.txt", ""); // remove the _enabled_mods part
+
+        File modpackFolder = new File(modpack);
+        System.out.println(modpackFolder.getName());
+        File[] files = modpackFolder.listFiles();
+
+        System.out.println("Modpack to load mods from: " + modpackName);
+        System.out.println("Loading mods from modpack folder: " + modpack);
+        System.out.println("Files found: " + Arrays.toString(files));
+
+        if (files!=null) {
+            for (File file : files) {
+                if (!file.isDirectory()) {
+                    System.out.println("File: " + file.getName() + "  is in the modpack folder.");
+                    modsInModpackForLoadingModpacks = files;
+                }
+            }
+        }
     }
 
     public void moveEnabledModsToModpackFolder(){ // move the enabled mods to the modpack folder
@@ -159,6 +184,6 @@ public class ModHandler {
     }
 
     public void setModpackName(String name){
-        modpackName += name;
+        modpackName = "modpacks/" + name;
     }
 }

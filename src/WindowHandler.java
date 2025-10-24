@@ -1,7 +1,10 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -15,11 +18,33 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
     private static String modsPath;
     private static String modpackName;
     public static ModHandler modHandler = new ModHandler();
+    private static File modsDirectory;
+    private static File mcModsDirectory;
 
-    public void createWindow() {
+    public void createWindow() throws FileNotFoundException {
         mainWindow.setSize(1280, 720);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.getContentPane().setLayout(new FlowLayout());
+        generateFiles();
+
+        Scanner fileScanner = new Scanner(modsDirectory);;
+
+        if (fileScanner.hasNextLine()) {
+            String modsDirPath = fileScanner.nextLine();
+            setModsPath(modsDirPath);
+        } else {
+            getModsDirectory();
+        }
+
+        fileScanner = new Scanner(mcModsDirectory);
+        if (fileScanner.hasNextLine()) {
+            String mcModsDirPath = fileScanner.nextLine();
+            setMcModsPath(mcModsDirPath);
+        } else {
+            getMinecraftModsDirectory();
+        }
+
+        setMods(getFiles(modsPath));
         createHomeScreen();
         mainWindow.setVisible(true);
     }
@@ -30,6 +55,7 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         String[] columnNames = {"Is Enabled", "Mod Name"};
         data = new Object[files.length][2];
         tableStates = new Boolean[files.length];
+
         for (int i = 0; i < files.length; i++) {
             data[i][0] = Boolean.FALSE; // Default to disabled
             tableStates[i] = false;
@@ -85,19 +111,33 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         JButton saveButton = new JButton("Save Enabled Mods");
         saveButton.addActionListener(e -> {
             modHandler.saveEnabledMods(getEnabledModsNames());
+            modHandler.createNewModpackFolder();
+            modHandler.setModsFolderPath(modsPath);
+            modHandler.moveEnabledModsToModpackFolder();
             System.out.println("Enabled mods saved.");
+            clearMainWindow();
+            createHomeScreen();
         });
 
         JButton saveAndLoadButton = new JButton("Save and Load Enabled Mods");
         saveAndLoadButton.addActionListener(e -> {
             modHandler.saveEnabledMods(getEnabledModsNames());
+            modHandler.createNewModpackFolder();
+            setModsPath(modsPath);
             modHandler.moveEnabledModsToModpackFolder();
             modHandler.loadEnabledMods();
             System.out.println("Enabled mods saved and loaded into Minecraft mods folder.");
+            clearMainWindow();
+            System.out.println("Window cleared and making new home screen");
+            createHomeScreen();
         });
 
         content.add(new JScrollPane(table));
         content.add(saveButton);
+        content.add(saveAndLoadButton);
+
+        mainWindow.revalidate();
+        mainWindow.repaint();
     }
 
     public String[] getEnabledModsNames(){
@@ -113,17 +153,42 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
     }
 
     public void createHomeScreen(){
+
         JButton createNew = new JButton("Create New");
         createNew.addActionListener(e -> {
             // Action for "Create New" button
             System.out.println("\"Create New\" button pressed");
             clearMainWindow();
-            System.out.println("Input modpack name:");
-            String modpackName = new Scanner(System.in).next();
-            setModpackName(modpackName);
-            initModHandler();
+
+            mainWindow.revalidate();
+            mainWindow.repaint();
+
+            JTextField modpackNameField = new JTextField(20);
+            JLabel modpackNameLabel = new JLabel("Enter Modpack Name:");
+            JButton submitButton = new JButton("Submit");
+            submitButton.addActionListener(ev -> {
+                System.out.println("Modpack name submitted: " + modpackNameField.getText());
+                modpackName = modpackNameField.getText();
+                setModpackName(modpackName);
+                initModHandler();
+            });
+
+            Container content = mainWindow.getContentPane();
+
+            content.add(modpackNameLabel);
+            content.add(modpackNameField);
+            content.add(submitButton);
+
+            mainWindow.revalidate();
+            mainWindow.repaint();
+
             createLabels(mods);
         });
+
+
+
+
+
 
         JButton useExisting = new JButton("Use Existing");
         useExisting.addActionListener(e -> {
@@ -133,9 +198,23 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
             modpackButtonGenerator();
         });
 
+
+
+
+
+        JButton quitButton = new JButton("Quit");
+        quitButton.addActionListener(ev -> {
+            System.out.println("Quit button pressed. Exiting application.");
+            System.exit(0);
+        });
+
         Container content = mainWindow.getContentPane();
         content.add(createNew);
         content.add(useExisting);
+        content.add(quitButton);
+
+        mainWindow.revalidate();
+        mainWindow.repaint();
     }
 
     public void modpackButtonGenerator() { // Dynamically generate buttons for modpack text files
@@ -150,9 +229,11 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
                     String finalModName = modName;
                     modpackButton.addActionListener(e -> {
                         System.out.println("Button \"" + finalModName + "\" was pressed.");
-                        setModpackName(modpackName);
+                        setModpackName(finalModName);
                         modHandler.setModpackName(modpackName);
+                        modHandler.setModsFolderPathMC(mcModsPath);
                         modHandler.loadEnabledMods();
+                        System.exit(0);
                     });
                     Container content = mainWindow.getContentPane();
                     content.add(modpackButton);
@@ -184,16 +265,116 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
     public void setModsPath(String mods) { modsPath = mods; }
 
     private void initModHandler(){
-
         modHandler.setModsFolderPathMC(mcModsPath); // hard
         modHandler.setModsFolderPath(modsPath);
         modHandler.setModpackName(modpackName);
     }
 
-    public void init(String modsPath, String mcModsPath, String modpackTextFolder, File[] modFiles){
-        setModsPath(modsPath);
-        setMcModsPath(mcModsPath);
-        setMods(modFiles);
-        createWindow();
+    public void init(){
+        try {
+            createWindow();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void getModsDirectory() {
+        JDialog dialog = new JDialog(mainWindow, "Enter Mods Directory", true);
+        dialog.setLayout(new FlowLayout());
+        dialog.setSize(400, 150);
+
+        JTextField modsDirField = new JTextField(20);
+        JLabel modsDirLabel = new JLabel("Enter Mods Directory (not Minecraft mods folder):");
+        JButton submitButton = new JButton("Submit");
+
+        submitButton.addActionListener(ev -> {
+            String modsDirPath = modsDirField.getText();
+            setModsPath(modsDirPath);
+
+            try (BufferedWriter writer = new BufferedWriter(new java.io.FileWriter("modsDirectories.txt"))) {
+                writer.write(modsDirPath);
+                System.out.println("Successfully wrote mods directory to the file.");
+            } catch (Exception e) {
+                System.out.println("An error occurred while writing to the file.");
+                e.printStackTrace();
+            }
+
+            dialog.dispose(); // Close the dialog
+        });
+
+        dialog.add(modsDirLabel);
+        dialog.add(modsDirField);
+        dialog.add(submitButton);
+
+        dialog.setVisible(true); // Wait until the dialog is closed
+    }
+
+    public void getMinecraftModsDirectory() {
+        JDialog dialog = new JDialog(mainWindow, "Enter Minecraft Mods Directory", true);
+        dialog.setLayout(new FlowLayout());
+        dialog.setSize(400, 150);
+
+        JTextField mcModsDirField = new JTextField(20);
+        JLabel mcModsDirLabel = new JLabel("Enter Minecraft Mods Directory:");
+        JButton submitButton = new JButton("Submit");
+
+        submitButton.addActionListener(ev -> {
+            String mcModsDirPath = mcModsDirField.getText();
+            setMcModsPath(mcModsDirPath);
+
+            try (BufferedWriter writer = new BufferedWriter(new java.io.FileWriter("mcModsDirectories.txt"))) {
+                writer.write(mcModsDirPath);
+                System.out.println("Successfully wrote Minecraft mods directory to the file.");
+            } catch (Exception e) {
+                System.out.println("An error occurred while writing to the file.");
+                e.printStackTrace();
+            }
+
+            dialog.dispose(); // Close the dialog
+        });
+
+        dialog.add(mcModsDirLabel);
+        dialog.add(mcModsDirField);
+        dialog.add(submitButton);
+
+        dialog.setVisible(true); // Wait until the dialog is closed
+    }
+
+    public static void generateFiles() { // makes any required files if they do not exist
+
+        modsDirectory = new File("modsDirectories.txt");
+        mcModsDirectory = new File("mcModsDirectories.txt");
+
+        try {
+            if (!modsDirectory.exists()) {
+                modsDirectory.createNewFile();
+                System.out.println("Created file: modsDirectories.txt");
+            }
+
+            if (!mcModsDirectory.exists()) {
+                mcModsDirectory.createNewFile();
+                System.out.println("Created file: mcModsDirectories.txt");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating files.");
+            e.printStackTrace();
+        }
+    }
+
+    public static File[] getFiles(String dirPath){ // get all files in a given directory
+        File workingDir = new File(dirPath);
+        File[] files = workingDir.listFiles();
+
+        if (files != null){
+            for (File file: files){
+                if (!file.isDirectory()) {
+                    System.out.println("File found: " + file.getName());
+                }
+            }
+        } else {
+            System.out.println("The directory is empty or does not exist.");
+        }
+        System.out.println();
+        return files;
     }
 }
