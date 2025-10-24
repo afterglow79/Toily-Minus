@@ -3,6 +3,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LOADED)
     public static JFrame mainWindow = new JFrame("Toily Minus");
@@ -86,6 +87,15 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
             modHandler.saveEnabledMods(getEnabledModsNames());
             System.out.println("Enabled mods saved.");
         });
+
+        JButton saveAndLoadButton = new JButton("Save and Load Enabled Mods");
+        saveAndLoadButton.addActionListener(e -> {
+            modHandler.saveEnabledMods(getEnabledModsNames());
+            modHandler.moveEnabledModsToModpackFolder();
+            modHandler.loadEnabledMods();
+            System.out.println("Enabled mods saved and loaded into Minecraft mods folder.");
+        });
+
         content.add(new JScrollPane(table));
         content.add(saveButton);
     }
@@ -108,6 +118,10 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
             // Action for "Create New" button
             System.out.println("\"Create New\" button pressed");
             clearMainWindow();
+            System.out.println("Input modpack name:");
+            String modpackName = new Scanner(System.in).next();
+            setModpackName(modpackName);
+            initModHandler();
             createLabels(mods);
         });
 
@@ -124,24 +138,30 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         content.add(useExisting);
     }
 
-    public void modpackButtonGenerator(){ // TODO -- for modpack text file in modpackTextFiles, generate a button with text that is the modpack name (minus the .txt), clicking the button loads the modpack
-        for (File modpackTextFile : new File("modpacks/").listFiles()) {
-            if (modpackTextFile.isFile() && modpackTextFile.getName().endsWith(".txt")) {
-                String modpackName = modpackTextFile.getName().replaceFirst("[.][^.]+$", ""); // remove the .txt extension
-                JButton modpackButton = new JButton(modpackName);
-                modpackButton.addActionListener(e -> {
-                    // Action for modpack button
-                    System.out.println("Modpack button \"" + modpackName + "\" pressed");
-                    // TODO -- load the modpack
-                });
-                Container content = mainWindow.getContentPane();
-                content.add(modpackButton);
-                modpackButton.addActionListener(e -> {
-                    System.out.println("Button \"" + modpackName + "\" was pressed.");
-                    setModpackName(modpackName);
-                    modHandler.setModpackName(modpackName);
-                });
+    public void modpackButtonGenerator() { // Dynamically generate buttons for modpack text files
+        File modpacksDir = new File("modpacks/");
+        if (modpacksDir.exists() && modpacksDir.isDirectory()) {
+            for (File modpackTextFile : modpacksDir.listFiles()) {
+                if (modpackTextFile.isFile() && modpackTextFile.getName().endsWith(".txt")) {
+                    String modName = modpackTextFile.getName().replaceFirst("[.][^.]+$", ""); // remove the .txt extension
+                    modName = modpackTextFile.getName().substring(0, modpackTextFile.getName().length() - 4); // remove the .txt extension
+                    modName = modName.replace("_enabled_mods", ""); // remove the _enabled_mods part
+                    JButton modpackButton = new JButton(modName);
+                    String finalModName = modName;
+                    modpackButton.addActionListener(e -> {
+                        System.out.println("Button \"" + finalModName + "\" was pressed.");
+                        setModpackName(modpackName);
+                        modHandler.setModpackName(modpackName);
+                        modHandler.loadEnabledMods();
+                    });
+                    Container content = mainWindow.getContentPane();
+                    content.add(modpackButton);
+                }
             }
+            mainWindow.revalidate();
+            mainWindow.repaint();
+        } else {
+            System.out.println("The 'modpacks/' directory does not exist or is not a directory.");
         }
     }
 
@@ -170,12 +190,10 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         modHandler.setModpackName(modpackName);
     }
 
-    public void init(String modsPath, String mcModsPath, String modpackTextFolder, File[] modFiles, String modpackName){
+    public void init(String modsPath, String mcModsPath, String modpackTextFolder, File[] modFiles){
         setModsPath(modsPath);
         setMcModsPath(mcModsPath);
-        setModpackName(modpackName);
         setMods(modFiles);
-        initModHandler();
         createWindow();
     }
 }

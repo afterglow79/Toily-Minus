@@ -22,7 +22,7 @@ public class Main {
         modFiles = getFiles(dirPath);
 
         WindowHandler mainWindow = new WindowHandler();
-        mainWindow.init(dirPath, mcModsPath, modpackTextFolder, modFiles, scanner.nextLine());
+        mainWindow.init(dirPath, mcModsPath, modpackTextFolder, modFiles);
 //
 //
 //        if (scanner.nextInt() == 1){
