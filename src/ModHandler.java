@@ -7,7 +7,7 @@ public class ModHandler {
 
     private static String modsFolderPathMC; // will be passed through, this is the path to the minecraft/mods folder
     private static String modsFolderPath; // path to the mods folder being used for modpack creation
-    private static String modpackName = "modpackTextFiles/";
+    private static String modpackName = "modpacks/";
     private static File[] modsInTheModpack;
 
     public void createModpackSaveFile() { // I apologize for the nonsensical names here, I am incredibly tired as I make this -- I will not fix them later

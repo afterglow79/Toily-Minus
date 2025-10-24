@@ -16,12 +16,13 @@ public class Main {
 //        System.out.println("Input a directory to scan for mods:");
 //        String dirPath = scanner.nextLine();
         String dirPath = "mods"; // hardcoded for testing
+        String mcModsPath = "pretendThisIsMinecraftModsFolder"; // hardcoded for testing
+        String modpackTextFolder = "modpackTextFiles"; // hardcoded for testing
 
         modFiles = getFiles(dirPath);
 
         WindowHandler mainWindow = new WindowHandler();
-        mainWindow.setMods(modFiles);
-        mainWindow.createWindow();
+        mainWindow.init(dirPath, mcModsPath, modpackTextFolder, modFiles, scanner.nextLine());
 //
 //
 //        if (scanner.nextInt() == 1){
@@ -73,6 +74,15 @@ public class Main {
             }
         } else {
             System.out.println("Mods directory already exists.");
+        }
+
+        modsDir = new File("modpacks");
+        if (!modsDir.exists()) {
+            if (modsDir.mkdir()) {
+                System.out.println("Modpacks directory created: " + modsDir.getName());
+            } else {
+                System.out.println("Failed to create modpacks directory.");
+            }
         }
     }
 }

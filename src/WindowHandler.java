@@ -10,6 +10,10 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
     public static Boolean[] tableStates;
     private static Object[][] data;
     private static File[] mods;
+    private static String mcModsPath;
+    private static String modsPath;
+    private static String modpackName;
+    public static ModHandler modHandler = new ModHandler();
 
     public void createWindow() {
         mainWindow.setSize(1280, 720);
@@ -77,7 +81,13 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
             }
         };
         table.setSize(content.getWidth()/ 4, content.getHeight());
+        JButton saveButton = new JButton("Save Enabled Mods");
+        saveButton.addActionListener(e -> {
+            modHandler.saveEnabledMods(getEnabledModsNames());
+            System.out.println("Enabled mods saved.");
+        });
         content.add(new JScrollPane(table));
+        content.add(saveButton);
     }
 
     public String[] getEnabledModsNames(){
@@ -97,6 +107,7 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         createNew.addActionListener(e -> {
             // Action for "Create New" button
             System.out.println("\"Create New\" button pressed");
+            clearMainWindow();
             createLabels(mods);
         });
 
@@ -104,6 +115,8 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         useExisting.addActionListener(e -> {
             // Action for "Use Existing" button
             System.out.println("\"Use Existing\" button pressed");
+            clearMainWindow();
+            modpackButtonGenerator();
         });
 
         Container content = mainWindow.getContentPane();
@@ -111,11 +124,58 @@ public class WindowHandler{ // TODO -- MAKE BUTTONS FOR EACH MOD (DYNAMICALLY LO
         content.add(useExisting);
     }
 
-    public void modpackButtonGenerator(){ // TODO -- for modpack text file inmodpackTextFiles, generate a button with text that is the modpack name (minus the .txt), clicking the button loads the modpack
+    public void modpackButtonGenerator(){ // TODO -- for modpack text file in modpackTextFiles, generate a button with text that is the modpack name (minus the .txt), clicking the button loads the modpack
+        for (File modpackTextFile : new File("modpacks/").listFiles()) {
+            if (modpackTextFile.isFile() && modpackTextFile.getName().endsWith(".txt")) {
+                String modpackName = modpackTextFile.getName().replaceFirst("[.][^.]+$", ""); // remove the .txt extension
+                JButton modpackButton = new JButton(modpackName);
+                modpackButton.addActionListener(e -> {
+                    // Action for modpack button
+                    System.out.println("Modpack button \"" + modpackName + "\" pressed");
+                    // TODO -- load the modpack
+                });
+                Container content = mainWindow.getContentPane();
+                content.add(modpackButton);
+                modpackButton.addActionListener(e -> {
+                    System.out.println("Button \"" + modpackName + "\" was pressed.");
+                    setModpackName(modpackName);
+                    modHandler.setModpackName(modpackName);
+                });
+            }
+        }
+    }
 
+    public void clearMainWindow() {
+        Container content = mainWindow.getContentPane();
+        content.removeAll();
+        mainWindow.revalidate();
+        mainWindow.repaint();
     }
 
     public void setMods(File[] modFiles){
         mods = modFiles;
+    }
+
+
+    public void setMcModsPath(String modsPath) { mcModsPath = modsPath; }
+
+    public void setModpackName(String modpack){ modpackName = modpack; }
+
+    public void setModsPath(String mods) { modsPath = mods; }
+
+    private void initModHandler(){
+
+        modHandler.setModsFolderPathMC(mcModsPath); // hard
+        modHandler.setModsFolderPath(modsPath);
+        modHandler.setModpackName(modpackName);
+    }
+
+    public void init(String modsPath, String mcModsPath, String modpackTextFolder, File[] modFiles, String modpackName){
+        setModsPath(modsPath);
+        setMcModsPath(mcModsPath);
+        setModpackName(modpackName);
+        setMods(modFiles);
+        initModHandler();
+        createWindow();
     }
 }
