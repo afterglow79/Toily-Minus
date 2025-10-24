@@ -65,18 +65,7 @@ public class Main {
     }
 
     public static void generateDirectories(){
-        File modsDir = new File("modpackTextFiles");
-        if (!modsDir.exists()){
-            if (modsDir.mkdir()){
-                System.out.println("Mods directory created: " + modsDir.getName());
-            } else {
-                System.out.println("Failed to create mods directory.");
-            }
-        } else {
-            System.out.println("Mods directory already exists.");
-        }
-
-        modsDir = new File("modpacks");
+        File modsDir = new File("modpacks");
         if (!modsDir.exists()) {
             if (modsDir.mkdir()) {
                 System.out.println("Modpacks directory created: " + modsDir.getName());
