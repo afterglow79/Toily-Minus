@@ -74,7 +74,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             for (int i = 0; i < files.length; i++) {
                 data[i][0] = Boolean.FALSE; // Default to disabled
                 tableStates[i] = false;
-            }}
+            }} isEditingModpack = false;
 
         model = new DefaultTableModel(data, columnNames); // https://stackoverflow.com/questions/7391877/how-to-add-checkboxes-to-jtable-swing
 
