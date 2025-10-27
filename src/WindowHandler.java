@@ -20,6 +20,8 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
     public static ModHandler modHandler = new ModHandler();
     private static File modsDirectory;
     private static File mcModsDirectory;
+    private boolean isEditingModpack = false;
+    private boolean[] enabledMods;
 
     public void createWindow() throws FileNotFoundException {
         mainWindow.setSize(1280, 720);
@@ -57,15 +59,22 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         tableStates = new Boolean[files.length];
 
         for (int i = 0; i < files.length; i++) {
-            data[i][0] = Boolean.FALSE; // Default to disabled
-            tableStates[i] = false;
-        }
-
-        for (int i = 0; i < files.length; i++) {
             if (!files[i].isDirectory()) {
                 data[i][1] = files[i].getName();
             }
         }
+
+        if (isEditingModpack) {
+            getModStates();
+            for (int i = 0; i < files.length; i++) {
+                data[i][0] = enabledMods[i]; // Set checkbox state based on enabledMods
+                tableStates[i] = enabledMods[i];
+            }
+        } else {
+            for (int i = 0; i < files.length; i++) {
+                data[i][0] = Boolean.FALSE; // Default to disabled
+                tableStates[i] = false;
+            }}
 
         model = new DefaultTableModel(data, columnNames); // https://stackoverflow.com/questions/7391877/how-to-add-checkboxes-to-jtable-swing
 
@@ -124,6 +133,9 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             modHandler.saveEnabledMods(getEnabledModsNames());
             modHandler.createNewModpackFolder();
             setModsPath(modsPath);
+            setMcModsPath(mcModsPath);
+            modHandler.setModsFolderPath(modsPath);
+            modHandler.setModsFolderPathMC(mcModsPath);
             modHandler.moveEnabledModsToModpackFolder();
             modHandler.loadEnabledMods();
             System.out.println("Enabled mods saved and loaded into Minecraft mods folder.");
@@ -186,10 +198,6 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         });
 
 
-
-
-
-
         JButton useExisting = new JButton("Use Existing");
         useExisting.addActionListener(e -> {
             // Action for "Use Existing" button
@@ -199,18 +207,25 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         });
 
 
-
-
-
         JButton quitButton = new JButton("Quit");
         quitButton.addActionListener(ev -> {
             System.out.println("Quit button pressed. Exiting application.");
             System.exit(0);
         });
 
+        JButton editModpackButton = new JButton("Edit Modpack");
+        editModpackButton.addActionListener(e -> {
+            // Action for "Edit Modpack" button
+            isEditingModpack = true;
+            System.out.println("\"Edit Modpack\" button pressed");
+            clearMainWindow();
+            modpackButtonGenerator();
+        });
+
         Container content = mainWindow.getContentPane();
         content.add(createNew);
         content.add(useExisting);
+        content.add(editModpackButton);
         content.add(quitButton);
 
         mainWindow.revalidate();
@@ -232,8 +247,13 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
                         setModpackName(finalModName);
                         modHandler.setModpackName(modpackName);
                         modHandler.setModsFolderPathMC(mcModsPath);
-                        modHandler.loadEnabledMods();
-                        System.exit(0);
+                        if (!isEditingModpack) {
+                            modHandler.loadEnabledMods();
+                            System.exit(0);
+                        } else {
+                            clearMainWindow();
+                            createLabels(getFiles(modsPath));
+                        }
                     });
                     Container content = mainWindow.getContentPane();
                     content.add(modpackButton);
@@ -253,16 +273,6 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         mainWindow.repaint();
     }
 
-    public void setMods(File[] modFiles){
-        mods = modFiles;
-    }
-
-
-    public void setMcModsPath(String modsPath) { mcModsPath = modsPath; }
-
-    public void setModpackName(String modpack){ modpackName = modpack; }
-
-    public void setModsPath(String mods) { modsPath = mods; }
 
     private void initModHandler(){
         modHandler.setModsFolderPathMC(mcModsPath); // hard
@@ -377,4 +387,35 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         System.out.println();
         return files;
     }
+
+    private void getModStates(){
+        enabledMods = new boolean[data.length];
+        String filename = "modpacks/" + modpackName + "_enabled_mods.txt";
+        try (Scanner scanner = new Scanner(new File(filename))) {
+            int index = 0;
+            while (scanner.hasNextLine() && index < data.length) {
+                String modName = scanner.nextLine();
+                for (int i = 0; i < data.length; i++) {
+                    if (data[i][1].equals(modName)) {
+                        enabledMods[i] = true;
+                        break;
+                    }
+                }
+                index++;
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred while reading the file: " + filename);
+            e.printStackTrace();
+        }
+    }
+
+    public void setMods(File[] modFiles){
+        mods = modFiles;
+    }
+
+    public void setMcModsPath(String modsPath) { mcModsPath = modsPath; }
+
+    public void setModpackName(String modpack){ modpackName = modpack; }
+
+    public void setModsPath(String mods) { modsPath = mods; }
 }
