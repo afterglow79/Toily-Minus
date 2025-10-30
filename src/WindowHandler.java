@@ -17,11 +17,12 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
     private static String mcModsPath;
     private static String modsPath;
     private static String modpackName;
-    public static ModHandler modHandler = new ModHandler();
+    public static ModHandler modHandler;
     private static File modsDirectory;
     private static File mcModsDirectory;
     private boolean isEditingModpack = false;
     private boolean[] enabledMods;
+    public static Logger logger;
 
     public void createWindow() throws FileNotFoundException {
         mainWindow.setSize(1280, 720);
@@ -84,14 +85,19 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             if (column == 0) { // Check if the checkbox column was modified
                 boolean isChecked = (boolean) model.getValueAt(row, column);
                 tableStates[row] = isChecked;
+
                 System.out.println("Row " + row + " checkbox is now: " + isChecked + " | " + data[row][1]);
                 System.out.println("\n Current table states:    " + Arrays.toString(tableStates));
                 System.out.println();
+
+                logger.log("Row " + row + " checkbox is now: " + isChecked + " | " + data[row][1]);
+                logger.log(" Current table states:    " + Arrays.toString(tableStates));
             }
 
             for (int i = 0; i < tableStates.length; i++) {
                 if (tableStates[i] == true) {
                     System.out.println(data[i][1] + "   is enabled");
+                    logger.log(data[i][1] + " is enabled");
                 }
             }
             System.out.println();
@@ -124,6 +130,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             modHandler.setModsFolderPath(modsPath);
             modHandler.moveEnabledModsToModpackFolder();
             System.out.println("Enabled mods saved.");
+            logger.log("Enabled mods saved.");
             clearMainWindow();
             createHomeScreen();
         });
@@ -139,8 +146,10 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             modHandler.moveEnabledModsToModpackFolder();
             modHandler.loadEnabledMods();
             System.out.println("Enabled mods saved and loaded into Minecraft mods folder.");
+            logger.log("Enabled mods saved and loaded into Minecraft mods folder.");
             clearMainWindow();
             System.out.println("Window cleared and making new home screen");
+            logger.log("Window cleared and making new home screen");
             createHomeScreen();
         });
 
@@ -170,6 +179,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         createNew.addActionListener(e -> {
             // Action for "Create New" button
             System.out.println("\"Create New\" button pressed");
+            logger.log("Create New button pressed");
             clearMainWindow();
 
             mainWindow.revalidate();
@@ -180,6 +190,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             JButton submitButton = new JButton("Submit");
             submitButton.addActionListener(ev -> {
                 System.out.println("Modpack name submitted: " + modpackNameField.getText());
+                logger.log("Modpack name submitted: " + modpackNameField.getText());
                 modpackName = modpackNameField.getText();
                 setModpackName(modpackName);
                 initModHandler();
@@ -202,6 +213,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         useExisting.addActionListener(e -> {
             // Action for "Use Existing" button
             System.out.println("\"Use Existing\" button pressed");
+            logger.log("Use Existing button pressed");
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -210,6 +222,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         JButton quitButton = new JButton("Quit");
         quitButton.addActionListener(ev -> {
             System.out.println("Quit button pressed. Exiting application.");
+            logger.log("Quit button pressed. Exiting application.");
             System.exit(0);
         });
 
@@ -218,6 +231,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             // Action for "Edit Modpack" button
             isEditingModpack = true;
             System.out.println("\"Edit Modpack\" button pressed");
+            logger.log("Edit Modpack button pressed");
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -244,6 +258,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
                     String finalModName = modName;
                     modpackButton.addActionListener(e -> {
                         System.out.println("Button \"" + finalModName + "\" was pressed.");
+                        logger.log("Button \"" + finalModName + "\" was pressed.");
                         setModpackName(finalModName);
                         modHandler.setModpackName(modpackName);
                         modHandler.setModsFolderPathMC(mcModsPath);
@@ -263,6 +278,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             mainWindow.repaint();
         } else {
             System.out.println("The 'modpacks/' directory does not exist or is not a directory.");
+            logger.log("The 'modpacks/' directory does not exist or is not a directory.");
         }
     }
 
@@ -280,10 +296,15 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         modHandler.setModpackName(modpackName);
     }
 
-    public void init(){
+    public void init(Logger logger){
+        this.logger = logger;
+        this.modHandler = new ModHandler(logger);
         try {
             createWindow();
+            logger.log("Window initialized successfully.");
         } catch (FileNotFoundException e) {
+            logger.log("An error occurred while initializing the window.");
+            logger.log(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -304,8 +325,11 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             try (BufferedWriter writer = new BufferedWriter(new java.io.FileWriter("modsDirectories.txt"))) {
                 writer.write(modsDirPath);
                 System.out.println("Successfully wrote mods directory to the file.");
+                logger.log("Successfully wrote mods directory to the file.");
             } catch (Exception e) {
                 System.out.println("An error occurred while writing to the file.");
+                logger.log("An error occurred while writing to the file.");
+                logger.log(e.getMessage());
                 e.printStackTrace();
             }
 
@@ -335,8 +359,11 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             try (BufferedWriter writer = new BufferedWriter(new java.io.FileWriter("mcModsDirectories.txt"))) {
                 writer.write(mcModsDirPath);
                 System.out.println("Successfully wrote Minecraft mods directory to the file.");
+                logger.log("Successfully wrote Minecraft mods directory to the file.");
             } catch (Exception e) {
                 System.out.println("An error occurred while writing to the file.");
+                logger.log("An error occurred while writing to the file.");
+                logger.log(e.getMessage());
                 e.printStackTrace();
             }
 
@@ -359,14 +386,18 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             if (!modsDirectory.exists()) {
                 modsDirectory.createNewFile();
                 System.out.println("Created file: modsDirectories.txt");
+                logger.log("Created file: modsDirectories.txt");
             }
 
             if (!mcModsDirectory.exists()) {
                 mcModsDirectory.createNewFile();
                 System.out.println("Created file: mcModsDirectories.txt");
+                logger.log("Created file: mcModsDirectories.txt");
             }
         } catch (IOException e) {
             System.out.println("An error occurred while creating files.");
+            logger.log("An error occurred while creating files.");
+            logger.log(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -379,10 +410,12 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             for (File file: files){
                 if (!file.isDirectory()) {
                     System.out.println("File found: " + file.getName());
+                    logger.log("File found: " + file.getName());
                 }
             }
         } else {
             System.out.println("The directory is empty or does not exist.");
+            logger.log("The directory is empty or does not exist.");
         }
         System.out.println();
         return files;
@@ -405,17 +438,16 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
             }
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred while reading the file: " + filename);
+            logger.log("An error occurred while reading the file: " + filename);
             e.printStackTrace();
         }
     }
 
-    public void setMods(File[] modFiles){
-        mods = modFiles;
-    }
+    public void setMods(File[] modFiles){ mods = modFiles; logger.log("Mods set in WindowHandler.");}
 
-    public void setMcModsPath(String modsPath) { mcModsPath = modsPath; }
+    public void setMcModsPath(String modsPath) { mcModsPath = modsPath; logger.log("Minecraft mods path set to: " + modsPath); }
 
-    public void setModpackName(String modpack){ modpackName = modpack; }
+    public void setModpackName(String modpack){ modpackName = modpack; logger.log("Modpack name set to: " + modpack); }
 
-    public void setModsPath(String mods) { modsPath = mods; }
+    public void setModsPath(String mods) { modsPath = mods; logger.log("Mods path set to: " + modsPath); }
 }
