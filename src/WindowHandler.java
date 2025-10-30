@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, AND THE ABILITY TO SEARCH FOR MODS WHEN CREATING A MODPACK
+public class WindowHandler{ // TODO -- Allow for deletion of modpacks, differentiation between loaders, and the ability to search for mods when making a modpack
     public static JFrame mainWindow = new JFrame("Toily Minus");
     private static DefaultTableModel model;
     public static Boolean[] tableStates;
@@ -93,7 +93,8 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
                 logger.log("Row " + row + " checkbox is now: " + isChecked + " | " + data[row][1]);
                 logger.log(" Current table states:    " + Arrays.toString(tableStates));
             }
-
+            logger.log(""); // intentionally blank for a newline
+            logger.log("---------------- Enabled Mods ----------------");
             for (int i = 0; i < tableStates.length; i++) {
                 if (tableStates[i] == true) {
                     System.out.println(data[i][1] + "   is enabled");
@@ -101,6 +102,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
                 }
             }
             System.out.println();
+            logger.log("------------------------------------------------ \n");
 
         });
 
@@ -246,7 +248,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         mainWindow.repaint();
     }
 
-    public void modpackButtonGenerator() { // Dynamically generate buttons for modpack text files
+    private void modpackButtonGenerator() { // Dynamically generate buttons for modpack text files
         File modpacksDir = new File("modpacks/");
         if (modpacksDir.exists() && modpacksDir.isDirectory()) {
             for (File modpackTextFile : modpacksDir.listFiles()) {
@@ -282,7 +284,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         }
     }
 
-    public void clearMainWindow() {
+    private void clearMainWindow() {
         Container content = mainWindow.getContentPane();
         content.removeAll();
         mainWindow.revalidate();
@@ -291,7 +293,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
 
 
     private void initModHandler(){
-        modHandler.setModsFolderPathMC(mcModsPath); // hard
+        modHandler.setModsFolderPathMC(mcModsPath);
         modHandler.setModsFolderPath(modsPath);
         modHandler.setModpackName(modpackName);
     }
@@ -309,7 +311,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         }
     }
 
-    public void getModsDirectory() {
+    private void getModsDirectory() {
         JDialog dialog = new JDialog(mainWindow, "Enter Mods Directory", true);
         dialog.setLayout(new FlowLayout());
         dialog.setSize(400, 150);
@@ -343,7 +345,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         dialog.setVisible(true); // Wait until the dialog is closed
     }
 
-    public void getMinecraftModsDirectory() {
+    private void getMinecraftModsDirectory() {
         JDialog dialog = new JDialog(mainWindow, "Enter Minecraft Mods Directory", true);
         dialog.setLayout(new FlowLayout());
         dialog.setSize(400, 150);
@@ -377,7 +379,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         dialog.setVisible(true); // Wait until the dialog is closed
     }
 
-    public static void generateFiles() { // makes any required files if they do not exist
+    private static void generateFiles() { // makes any required files if they do not exist
 
         modsDirectory = new File("modsDirectories.txt");
         mcModsDirectory = new File("mcModsDirectories.txt");
@@ -402,7 +404,7 @@ public class WindowHandler{ // TODO -- ALLOW FOR EDITING OF MODPACKS, DELETION, 
         }
     }
 
-    public static File[] getFiles(String dirPath){ // get all files in a given directory
+    private static File[] getFiles(String dirPath){ // get all files in a given directory
         File workingDir = new File(dirPath);
         File[] files = workingDir.listFiles();
 
