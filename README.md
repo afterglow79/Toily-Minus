@@ -3,14 +3,14 @@ This is a mod manager built to run on Linux (albeit with a bad UI). It does not 
 ----
 # Features
 - Custom modpack creation
-- Ability to save & load immediately, or save for later
+- Ability to save & load immediately, =save for later, or edit preexisting modpacks
 - Loading of already saved modpacks
   - Stores your modpack in a folder called "modpacks/[modpack_name], this keeps all the .jar files in one place (at the cost of storage)
   - A lot of loading is handled via txt files, so it should be largely storage-efficient (besides above), and it should be fairly fast at doing so.
   
 # What I plan to implement
 - Differentiation between loaders (reasonably low priority)
-- Ability to edit modpacks (high priority)
+- Ability to edit modpacks (high priority) -- DONE
 - Make the UI look better (this damn well may never happen)
 - Optimize it (medium priority, it should run fine enough)
 - Anything else that I can think of that would be useful
