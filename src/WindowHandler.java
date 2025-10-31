@@ -23,13 +23,13 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     private boolean isEditingModpack = false;
     private boolean[] enabledMods;
     public static Logger logger;
+    public static String modLoader;
 
     public void createWindow() throws FileNotFoundException {
         mainWindow.setSize(1280, 720);
         mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainWindow.getContentPane().setLayout(new FlowLayout());
         generateFiles();
-
         Scanner fileScanner = new Scanner(modsDirectory);;
 
         if (fileScanner.hasNextLine()) {
@@ -102,7 +102,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
                 }
             }
             System.out.println();
-            logger.log("------------------------------------------------ \n");
+            logger.log("------------------------------------------------\n");
 
         });
 
@@ -154,7 +154,6 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             logger.log("Window cleared and making new home screen");
             createHomeScreen();
         });
-
         content.add(new JScrollPane(table));
         content.add(saveButton);
         content.add(saveAndLoadButton);
@@ -186,6 +185,9 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
 
             mainWindow.revalidate();
             mainWindow.repaint();
+            getModLoader();
+            System.out.println("Creating a modpack using " + modLoader);
+            logger.log("Creating a modpack using " + modLoader);
 
             JTextField modpackNameField = new JTextField(20);
             JLabel modpackNameLabel = new JLabel("Enter Modpack Name:");
@@ -216,6 +218,10 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             // Action for "Use Existing" button
             System.out.println("\"Use Existing\" button pressed");
             logger.log("Use Existing button pressed");
+            getModLoader();
+            System.out.println("Loading modpacks that use " + modLoader);
+            logger.log("Loading modpacks that use " + modLoader);
+            getModLoader();
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -233,7 +239,10 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             // Action for "Edit Modpack" button
             isEditingModpack = true;
             System.out.println("\"Edit Modpack\" button pressed");
-            logger.log("Edit Modpack button pressed");
+            logger.log("\"Edit Modpack\" button pressed");
+            getModLoader();
+            System.out.println("Loading modpacks that use " + modLoader + " for editing");
+            logger.log("Loading modpacks that use " + modLoader + " for editing");
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -425,7 +434,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
 
     private void getModStates(){
         enabledMods = new boolean[data.length];
-        String filename = "modpacks/" + modpackName + "_enabled_mods.txt";
+        String filename = "modpacks/" + modLoader + modpackName + "_enabled_mods.txt";
         try (Scanner scanner = new Scanner(new File(filename))) {
             int index = 0;
             while (scanner.hasNextLine() && index < data.length) {
@@ -445,7 +454,51 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
         }
     }
 
-    public void setMods(File[] modFiles){ mods = modFiles; logger.log("Mods set in WindowHandler.");}
+    private void getModLoader(){ // TODO -- MAKE THIS WORK
+        JDialog dialog = new JDialog(mainWindow, "Select Mod Loader", true);
+        dialog.setLayout(new FlowLayout());
+        dialog.setSize(400, 150);
+
+        String[] loaders = {"Forge", "Fabric", "Quilt", "NeoForge"};
+        JComboBox<String> loaderComboBox = new JComboBox<>(loaders);
+        JLabel loaderLabel = new JLabel("Select Mod Loader:");
+        JButton submitButton = new JButton("Submit");
+
+        submitButton.addActionListener(ev -> {
+            String selectedLoader = (String) loaderComboBox.getSelectedItem();
+            modLoader = selectedLoader;
+            System.out.println("Mod loader selected: " + selectedLoader);
+            logger.log("Mod loader selected: " + selectedLoader);
+            dialog.dispose(); // Close the dialog
+            makeNewDirectory("modpacks/" + modLoader + "/");
+
+        });
+
+        dialog.add(loaderLabel);
+        dialog.add(loaderComboBox);
+        dialog.add(submitButton);
+        dialog.setVisible(true); // Wait until the dialog is closed
+    }
+
+    public void makeNewDirectory(String dirName){
+        File newDir = new File(dirName);
+        System.out.println("Creating new directory: " + newDir.getAbsolutePath());
+        logger.log("Trying to create loader directory: " + newDir.getAbsolutePath());
+        if (!newDir.exists()){
+            if (newDir.mkdir()){
+                System.out.println("Directory created: " + newDir.getName());
+                logger.log("Directory created: " + newDir.getName());
+            } else {
+                System.out.println("Failed to create directory.");
+                logger.log("Failed to create directory: " + newDir.getName());
+            }
+        } else {
+            System.out.println("Directory already exists.");
+            logger.log("Directory already exists: " + newDir.getName());
+        }
+    }
+
+    public void setMods(File[] modFiles){ mods = modFiles; logger.log("Mods set in WindowHandler."); }
 
     public void setMcModsPath(String modsPath) { mcModsPath = modsPath; logger.log("Minecraft mods path set to: " + modsPath); }
 

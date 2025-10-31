@@ -20,8 +20,6 @@ public class Main {
         WindowHandler mainWindow = new WindowHandler();
         logger.log("Window variable set.");
         mainWindow.init(logger);
-
-
     }
 
     public static void generateDirectories() {

@@ -10,7 +10,6 @@ public class Logger {
         init();
     }
 
-
     private void init(){
         generateDirectory();
         generateLogFile();
@@ -59,7 +58,7 @@ public class Logger {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedNow = now.format(formatter);
 
-            writer.write(formattedNow +":    " + message);
+            writer.write(formattedNow +" --    " + message);
             writer.newLine();
         } catch (IOException e) {
             System.out.println("An error occurred while writing to the log file.");

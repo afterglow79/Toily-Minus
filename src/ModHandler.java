@@ -4,7 +4,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class ModHandler {
+public class ModHandler { // TODO -- MAKE THIS WORK, DOES NOT CREATE THE RIGHT DIRECTORY CURRENTLY
 
     private static String modsFolderPathMC; // will be passed through, this is the path to the minecraft/mods folder
     private static String modsFolderPath; // path to the mods folder being used for modpack creation
@@ -12,6 +12,7 @@ public class ModHandler {
     private static File[] modsInTheModpack;
     private static File[] modsInModpackForLoadingModpacks;
     private static Logger logger;
+    private static String loader;
 
     public ModHandler(Logger logger) {
         this.logger = logger;
@@ -213,5 +214,7 @@ public class ModHandler {
 
     public void setModsFolderPathMC(String path){ modsFolderPathMC = path; logger.log("Set mods folder path to: " + path); }
 
-    public void setModpackName(String name){ modpackName = "modpacks/" + name; logger.log("Set modpack name to: " + name); }
+    public void setModpackName(String name){ modpackName = "modpacks/" + loader + name; logger.log("Set modpack name to: " + name); }
+
+    public void setLoader(String modLoader){ loader = modLoader; logger.log("Set loader to: " + loader); }
 }
