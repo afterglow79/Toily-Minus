@@ -221,7 +221,6 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             getModLoader();
             System.out.println("Loading modpacks that use " + modLoader);
             logger.log("Loading modpacks that use " + modLoader);
-            getModLoader();
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -454,7 +453,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
         }
     }
 
-    private void getModLoader(){ // TODO -- MAKE THIS WORK
+    private void getModLoader(){
         JDialog dialog = new JDialog(mainWindow, "Select Mod Loader", true);
         dialog.setLayout(new FlowLayout());
         dialog.setSize(400, 150);
@@ -464,14 +463,18 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
         JLabel loaderLabel = new JLabel("Select Mod Loader:");
         JButton submitButton = new JButton("Submit");
 
+        for (String directory : loaders){
+            makeNewDirectory("modpacks/" + directory + "/");
+        }
+
         submitButton.addActionListener(ev -> {
             String selectedLoader = (String) loaderComboBox.getSelectedItem();
-            modLoader = selectedLoader;
+            selectedLoader += "/";
+            setModLoader(selectedLoader);
+            modHandler.setLoader(selectedLoader);
             System.out.println("Mod loader selected: " + selectedLoader);
             logger.log("Mod loader selected: " + selectedLoader);
             dialog.dispose(); // Close the dialog
-            makeNewDirectory("modpacks/" + modLoader + "/");
-
         });
 
         dialog.add(loaderLabel);
@@ -505,4 +508,6 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     public void setModpackName(String modpack){ modpackName = modpack; logger.log("Modpack name set to: " + modpack); }
 
     public void setModsPath(String mods) { modsPath = mods; logger.log("Mods path set to: " + modsPath); }
+
+    public void setModLoader(String loader){ modLoader = loader; logger.log("Mod loader set to: " + loader); }
 }
