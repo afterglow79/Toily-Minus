@@ -17,25 +17,6 @@ public class ModHandler { // TODO -- MAKE THIS WORK, DOES NOT CREATE THE RIGHT D
     public ModHandler(Logger logger) {
         this.logger = logger;
     }
-    public void createModpackSaveFile() { // I apologize for the nonsensical names here, I am incredibly tired as I make this -- I will not fix them later
-        File thoseWhoEnable = new File(modpackName + "_enabled_mods.txt");
-        try {
-            if (thoseWhoEnable.createNewFile()) { // Create the file if it does not exist
-                System.out.println("File created: " + thoseWhoEnable.getName());
-                logger.log("Modpack save file created: " + thoseWhoEnable.getName());
-            } else { // If the file already exists, say so
-                System.out.println("File already exists.");
-                logger.log("Modpack save file already exists: " + thoseWhoEnable.getName());
-            }
-        } catch (Exception e) { // Catch any errors
-            System.out.println("An error occurred.");
-            logger.log("An error occurred while creating modpack save file: " + thoseWhoEnable.getName());
-            logger.log(e.getMessage());
-            e.printStackTrace();
-        }
-        System.out.println();
-    }
-
     public void saveEnabledMods(String[] mostEnabledMan) { // see above comment
         // saves the names of enabled mods to the text file
         String filename = modpackName + "_enabled_mods.txt";
