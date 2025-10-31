@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class WindowHandler{ // TODO -- Allow for deletion of modpacks, differentiation between loaders, and the ability to search for mods when making a modpack
+public class WindowHandler{ // TODO -- Allow the ability to search for mods when making a modpack
     public static JFrame mainWindow = new JFrame("Toily Minus");
     private static DefaultTableModel model;
     public static Boolean[] tableStates;

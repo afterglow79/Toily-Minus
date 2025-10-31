@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="LinuxMCModManager:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/LinuxMCModManager_jar</output-path>
+    <root id="archive" name="LinuxMCModManager.jar">
+      <element id="module-output" name="LinuxMCModManager" />
+    </root>
+  </artifact>
+</component>
