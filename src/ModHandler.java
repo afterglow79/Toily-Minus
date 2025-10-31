@@ -192,6 +192,28 @@ public class ModHandler { // TODO -- MAKE THIS WORK, DOES NOT CREATE THE RIGHT D
         logger.log("Copied " + source.getName() + " to " + dest.getName());
     }
 
+    public static void deleteModpack(String modpackPath){
+        new File(modpackPath + "_enabled_mods.txt").delete();
+        File modpackDir = new File(modpackPath + "_modpack/");
+        if (modpackDir.exists() && modpackDir.isDirectory()){
+            File[] files = modpackDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (!file.isDirectory()) {
+                        file.delete();
+                        logger.log("Deleted file: " + file.getName());
+                    }
+                }
+            }
+            modpackDir.delete();
+            logger.log("Deleted modpack directory: " + modpackDir.getName());
+        }
+        System.out.println("Deleted modpack at: " + modpackPath + "_enabled_mods.txt");
+        System.out.println("Deleted modpack at: " + modpackPath + "_modpack/");
+        logger.log("Deleted modpack at: " + modpackPath + "_enabled_mods.txt");
+        logger.log("Deleted modpack at: " + modpackPath + "_modpack/");
+    }
+
     public void setModsFolderPath(String path){ modsFolderPath = path; logger.log("Set mods folder path to: " + path); }
 
     public void setModsFolderPathMC(String path){ modsFolderPathMC = path; logger.log("Set mods folder path to: " + path); }

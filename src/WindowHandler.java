@@ -24,6 +24,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     private boolean[] enabledMods;
     public static Logger logger;
     public static String modLoader;
+    private static boolean deletingModpacks;
 
     public void createWindow() throws FileNotFoundException {
         mainWindow.setSize(1280, 720);
@@ -247,10 +248,23 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             modpackButtonGenerator();
         });
 
+        JButton deleteModpackButton = new JButton("Delete Modpack");
+        deleteModpackButton.addActionListener(e -> {// Action for "Delete Modpack" buttonSystem.out.println("\"Delete Modpack\" button pressed");logger.log("\"Delete Modpack\" button pressed");getModLoader();System.out.println("Loading modpacks that use " + modLoader + " for deletion");logger.log("Loading modpacks that use " + modLoader + " for deletion");clearMainWindow();File modpacksDir = new File("modpacks/" + modLoader);if (modpacksDir.exists() && modpacksDir.isDirectory()) {
+            deletingModpacks = true;
+            getModLoader();
+            System.out.println("\"Delete Modpack\" button pressed");
+            logger.log("\"Delete Modpack\" button pressed");
+            System.out.println("Loading modpacks that use " + modLoader + " for deletion");
+            logger.log("Loading modpacks that use " + modLoader + " for deletion");
+            clearMainWindow();
+            modpackButtonGenerator();
+        });
+
         Container content = mainWindow.getContentPane();
         content.add(createNew);
         content.add(useExisting);
         content.add(editModpackButton);
+        content.add(deleteModpackButton);
         content.add(quitButton);
 
         mainWindow.revalidate();
@@ -273,9 +287,14 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
                         setModpackName(finalModName);
                         modHandler.setModpackName(modpackName);
                         modHandler.setModsFolderPathMC(mcModsPath);
-                        if (!isEditingModpack) {
+                        if (!isEditingModpack && !deletingModpacks) {
                             modHandler.loadEnabledMods();
                             System.exit(0);
+                        } else if (deletingModpacks){ // this may be my first time ever using else if
+                            modHandler.deleteModpack("modpacks/" + modLoader + finalModName);
+                            deletingModpacks = false;
+                            clearMainWindow();
+                            createHomeScreen();
                         } else {
                             clearMainWindow();
                             createLabels(getFiles(modsPath));
