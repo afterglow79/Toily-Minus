@@ -124,7 +124,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
                 return column == 0; // only allow toggling the checkbox
             }
         };
-        table.setSize(content.getWidth()/ 4, content.getHeight());
+        table.setSize((int) (content.getWidth() / 4), (int) content.getHeight());
         JButton saveButton = new JButton("Save Enabled Mods");
         saveButton.addActionListener(e -> {
             modHandler.saveEnabledMods(getEnabledModsNames());
@@ -221,6 +221,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             getModLoader();
             System.out.println("Loading modpacks that use " + modLoader);
             logger.log("Loading modpacks that use " + modLoader);
+            modHandler.setLoader(modLoader);
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -257,7 +258,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     }
 
     private void modpackButtonGenerator() { // Dynamically generate buttons for modpack text files
-        File modpacksDir = new File("modpacks/");
+        File modpacksDir = new File("modpacks/" + modLoader);
         if (modpacksDir.exists() && modpacksDir.isDirectory()) {
             for (File modpackTextFile : modpacksDir.listFiles()) {
                 if (modpackTextFile.isFile() && modpackTextFile.getName().endsWith(".txt")) {

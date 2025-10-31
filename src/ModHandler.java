@@ -38,6 +38,7 @@ public class ModHandler { // TODO -- MAKE THIS WORK, DOES NOT CREATE THE RIGHT D
     public void loadEnabledMods() {
         String filename = modpackName + "_modpack";
         getModsInModpack(filename);
+        logger.log("Loading enabled mods from modpack: " + modpackName);
         try{
             clearMCModsFolder(); // clear the minecraft mods folder before loading new mods
             for (File mod : modsInModpackForLoadingModpacks){
@@ -198,4 +199,5 @@ public class ModHandler { // TODO -- MAKE THIS WORK, DOES NOT CREATE THE RIGHT D
     public void setModpackName(String name){ modpackName = "modpacks/" + loader + name; logger.log("Set modpack name to: " + name); }
 
     public void setLoader(String modLoader){ loader = modLoader; logger.log("Set loader to: " + loader); }
+
 }
