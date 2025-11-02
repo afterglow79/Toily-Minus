@@ -10,7 +10,7 @@ This is a mod manager built to run on Linux (albeit with a bad UI). It does not 
 - Logs all actions to a folder. This was by no means needed but it'll help me debug in the future.
   
 # What I plan to implement
-- Differentiation between loaders (medium priority)
+- ~~Differentiation between loaders (medium priority)~~ -- DONE
 - ~~Ability to edit modpacks (high priority)~~ -- DONE
 - Make the UI look better (this damn well may never happen)
 - Optimize it (medium priority, it should run fine enough)
