@@ -155,12 +155,14 @@ public class WindowHandler{ // TODO -- Allow the ability to search for mods when
             logger.log("Window cleared and making new home screen");
             createHomeScreen();
         });
+
         content.add(new JScrollPane(table));
         content.add(saveButton);
         content.add(saveAndLoadButton);
 
         mainWindow.revalidate();
         mainWindow.repaint();
+
     }
 
     public String[] getEnabledModsNames(){
@@ -289,6 +291,9 @@ public class WindowHandler{ // TODO -- Allow the ability to search for mods when
                         modHandler.setModsFolderPathMC(mcModsPath);
                         if (!isEditingModpack && !deletingModpacks) {
                             modHandler.loadEnabledMods();
+
+                            logger.log("Mods loaded into Minecraft mods folder. Quitting application.");
+                            System.out.println("Mods loaded into Minecraft mods folder. Quitting application.");
                             System.exit(0);
                         } else if (deletingModpacks){ // this may be my first time ever using else if
                             modHandler.deleteModpack("modpacks/" + modLoader + finalModName);

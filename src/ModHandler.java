@@ -4,7 +4,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class ModHandler { // TODO -- MAKE THIS WORK, DOES NOT CREATE THE RIGHT DIRECTORY CURRENTLY
+public class ModHandler {
 
     private static String modsFolderPathMC; // will be passed through, this is the path to the minecraft/mods folder
     private static String modsFolderPath; // path to the mods folder being used for modpack creation
