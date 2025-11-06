@@ -33,29 +33,37 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
         Scanner fileScanner = new Scanner(modsDirectory);;
 
         if (fileScanner.hasNextLine()) {
+            logger.log("Reading mods directory from file.");
             String modsDirPath = fileScanner.nextLine();
             setModsPath(modsDirPath);
         } else {
+            logger.log("Mods directory not found in file. Prompting user for input.");
             getModsDirectory();
         }
 
         fileScanner = new Scanner(mcModsDirectory);
         if (fileScanner.hasNextLine()) {
+            logger.log("Reading Minecraft mods directory from file.");
             String mcModsDirPath = fileScanner.nextLine();
             setMcModsPath(mcModsDirPath);
         } else {
+            logger.log("Minecraft mods directory not found in file. Prompting user for input.");
             getMinecraftModsDirectory();
         }
+
+        logger.log("Mods path set to: " + modsPath);
+        logger.log("Minecraft mods path set to: " + mcModsPath);
 
         setMods(getFiles(modsPath));
         createHomeScreen();
         mainWindow.setVisible(true);
+        logger.log("Home screen created, mods set, and window visible.");
     }
 
     public void createLabels(File[] files) {
         Container content = mainWindow.getContentPane();
 
-        String[] columnNames = {"Is Enabled", "Mod Name"};
+        String[] columnNames = {"In Modpack", "Mod Name"};
         data = new Object[files.length][2];
         tableStates = new Boolean[files.length];
 
@@ -76,6 +84,8 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
                 data[i][0] = Boolean.FALSE; // Default to disabled
                 tableStates[i] = false;
             }} isEditingModpack = false;
+
+        logger.log("Table data and states initialized.");
 
         model = new DefaultTableModel(data, columnNames); // https://stackoverflow.com/questions/7391877/how-to-add-checkboxes-to-jtable-swing
 

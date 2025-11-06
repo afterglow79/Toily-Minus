@@ -15,18 +15,19 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         logger.log("Scanner initialized.");
 
-        generateDirectories(); // generate any needed directories
+        generateDirectories(logger); // generate any needed directories
         logger.log("Directories generated.");
         WindowHandler mainWindow = new WindowHandler();
         logger.log("Window variable set.");
         mainWindow.init(logger);
     }
 
-    public static void generateDirectories() {
+    public static void generateDirectories(Logger log) {
         File modsDir = new File("modpacks");
         if (!modsDir.exists()) {
             if (modsDir.mkdir()) {
                 System.out.println("Modpacks directory created: " + modsDir.getName());
+                log.log("Modpacks directory created: " + modsDir.getName());
             } else {
                 System.out.println("Failed to create modpacks directory.");
             }

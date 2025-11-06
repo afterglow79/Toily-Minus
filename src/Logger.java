@@ -13,6 +13,7 @@ public class Logger {
     private void init(){
         generateDirectory();
         generateLogFile();
+        log("Logger initialized.");
     }
 
     private void generateLogFile(){
