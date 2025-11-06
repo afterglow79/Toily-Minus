@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class WindowHandler{ // TODO -- Allow for deletion of modpacks, differentiation between loaders, and the ability to search for mods when making a modpack
+public class WindowHandler{ // TODO -- Allow the ability to search for mods when making a modpack
     public static JFrame mainWindow = new JFrame("Toily Minus");
     private static DefaultTableModel model;
     public static Boolean[] tableStates;
@@ -24,6 +24,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     private boolean[] enabledMods;
     public static Logger logger;
     public static String modLoader;
+    private static boolean deletingModpacks;
 
     public void createWindow() throws FileNotFoundException {
         mainWindow.setSize(1280, 720);
@@ -134,7 +135,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
                 return column == 0; // only allow toggling the checkbox
             }
         };
-        table.setSize(content.getWidth()/ 4, content.getHeight());
+        table.setSize((int) (content.getWidth() / 4), (int) content.getHeight());
         JButton saveButton = new JButton("Save Enabled Mods");
         saveButton.addActionListener(e -> {
             modHandler.saveEnabledMods(getEnabledModsNames());
@@ -164,12 +165,14 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             logger.log("Window cleared and making new home screen");
             createHomeScreen();
         });
+
         content.add(new JScrollPane(table));
         content.add(saveButton);
         content.add(saveAndLoadButton);
 
         mainWindow.revalidate();
         mainWindow.repaint();
+
     }
 
     public String[] getEnabledModsNames(){
@@ -231,7 +234,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             getModLoader();
             System.out.println("Loading modpacks that use " + modLoader);
             logger.log("Loading modpacks that use " + modLoader);
-            getModLoader();
+            modHandler.setLoader(modLoader);
             clearMainWindow();
             modpackButtonGenerator();
         });
@@ -257,10 +260,23 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
             modpackButtonGenerator();
         });
 
+        JButton deleteModpackButton = new JButton("Delete Modpack");
+        deleteModpackButton.addActionListener(e -> {// Action for "Delete Modpack" buttonSystem.out.println("\"Delete Modpack\" button pressed");logger.log("\"Delete Modpack\" button pressed");getModLoader();System.out.println("Loading modpacks that use " + modLoader + " for deletion");logger.log("Loading modpacks that use " + modLoader + " for deletion");clearMainWindow();File modpacksDir = new File("modpacks/" + modLoader);if (modpacksDir.exists() && modpacksDir.isDirectory()) {
+            deletingModpacks = true;
+            getModLoader();
+            System.out.println("\"Delete Modpack\" button pressed");
+            logger.log("\"Delete Modpack\" button pressed");
+            System.out.println("Loading modpacks that use " + modLoader + " for deletion");
+            logger.log("Loading modpacks that use " + modLoader + " for deletion");
+            clearMainWindow();
+            modpackButtonGenerator();
+        });
+
         Container content = mainWindow.getContentPane();
         content.add(createNew);
         content.add(useExisting);
         content.add(editModpackButton);
+        content.add(deleteModpackButton);
         content.add(quitButton);
 
         mainWindow.revalidate();
@@ -268,7 +284,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     }
 
     private void modpackButtonGenerator() { // Dynamically generate buttons for modpack text files
-        File modpacksDir = new File("modpacks/");
+        File modpacksDir = new File("modpacks/" + modLoader);
         if (modpacksDir.exists() && modpacksDir.isDirectory()) {
             for (File modpackTextFile : modpacksDir.listFiles()) {
                 if (modpackTextFile.isFile() && modpackTextFile.getName().endsWith(".txt")) {
@@ -283,9 +299,17 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
                         setModpackName(finalModName);
                         modHandler.setModpackName(modpackName);
                         modHandler.setModsFolderPathMC(mcModsPath);
-                        if (!isEditingModpack) {
+                        if (!isEditingModpack && !deletingModpacks) {
                             modHandler.loadEnabledMods();
+
+                            logger.log("Mods loaded into Minecraft mods folder. Quitting application.");
+                            System.out.println("Mods loaded into Minecraft mods folder. Quitting application.");
                             System.exit(0);
+                        } else if (deletingModpacks){ // this may be my first time ever using else if
+                            modHandler.deleteModpack("modpacks/" + modLoader + finalModName);
+                            deletingModpacks = false;
+                            clearMainWindow();
+                            createHomeScreen();
                         } else {
                             clearMainWindow();
                             createLabels(getFiles(modsPath));
@@ -464,7 +488,7 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
         }
     }
 
-    private void getModLoader(){ // TODO -- MAKE THIS WORK
+    private void getModLoader(){
         JDialog dialog = new JDialog(mainWindow, "Select Mod Loader", true);
         dialog.setLayout(new FlowLayout());
         dialog.setSize(400, 150);
@@ -474,14 +498,18 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
         JLabel loaderLabel = new JLabel("Select Mod Loader:");
         JButton submitButton = new JButton("Submit");
 
+        for (String directory : loaders){
+            makeNewDirectory("modpacks/" + directory + "/");
+        }
+
         submitButton.addActionListener(ev -> {
             String selectedLoader = (String) loaderComboBox.getSelectedItem();
-            modLoader = selectedLoader;
+            selectedLoader += "/";
+            setModLoader(selectedLoader);
+            modHandler.setLoader(selectedLoader);
             System.out.println("Mod loader selected: " + selectedLoader);
             logger.log("Mod loader selected: " + selectedLoader);
             dialog.dispose(); // Close the dialog
-            makeNewDirectory("modpacks/" + modLoader + "/");
-
         });
 
         dialog.add(loaderLabel);
@@ -515,4 +543,6 @@ public class WindowHandler{ // TODO -- Allow for deletion of modpacks, different
     public void setModpackName(String modpack){ modpackName = modpack; logger.log("Modpack name set to: " + modpack); }
 
     public void setModsPath(String mods) { modsPath = mods; logger.log("Mods path set to: " + modsPath); }
+
+    public void setModLoader(String loader){ modLoader = loader; logger.log("Mod loader set to: " + loader); }
 }
