@@ -25,6 +25,7 @@ public class ModHandler {
             writer.write(content); // write the content to the file
             System.out.println("Successfully wrote to the file.");
             logger.log("Successfully wrote to the file.");
+            writer.write(loader);
 
         } catch (Exception e) {
             System.out.println("An error occurred while writing to the file.");
